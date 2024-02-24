@@ -9,3 +9,47 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Setter {
+  id            String        @id @default(cuid())
+  name          String
+  email         String        @unique
+  contactNumber String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  appointments  Appointment[]
+  user          User?
+}
+
+model User {
+  id        String   @id @default(cuid())
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  setterId  String   @unique()
+  setter    Setter   @relation(fields: [setterId], references: [id])
+}
+
+model DayOfTheWeek {
+  id           String        @id @default(cuid())
+  day          String        @unique()
+  value        Int
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  appointments Appointment[]
+}
+
+model Appointment {
+  id            String         @id @default(cuid())
+  setterId      String
+  isApproved    Boolean
+  startTime     DateTime
+  endTime       DateTime
+  title         String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  daysOftheWeek DayOfTheWeek[]
+  setter        Setter         @relation(fields: [setterId], references: [id])
+
+  @@index([setterId])
+}
