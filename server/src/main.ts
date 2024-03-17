@@ -3,7 +3,7 @@ import { AppModule } from './app.module'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, { cors: true })
   app.setGlobalPrefix('api')
   const config = new DocumentBuilder()
     .setTitle('Appointment Management System')
@@ -13,6 +13,6 @@ async function bootstrap() {
     .build()
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('swagger', app, document)
-  await app.listen(3000)
+  await app.listen(3030)
 }
 bootstrap()
