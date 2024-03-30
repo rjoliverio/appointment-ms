@@ -1,20 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString } from 'class-validator'
+import { IsEmail, IsString } from 'class-validator'
+import type { Setter as SetterModel } from '@prisma/client'
 
 export class SetterEntity {
   @IsString()
   @ApiProperty()
-  id: string
+  id: SetterModel['id']
 
   @IsString()
   @ApiProperty()
-  name: string
+  name: SetterModel['name']
+
+  @IsEmail()
+  @IsString()
+  @ApiProperty()
+  email: SetterModel['email']
 
   @IsString()
   @ApiProperty()
-  email: string
-
-  @IsString()
-  @ApiProperty()
-  contactNumber: string
+  contactNumber: SetterModel['contactNumber']
 }

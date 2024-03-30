@@ -5,12 +5,14 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import { useHooks } from './hooks'
 import SetAppointmentDialog from '../SetAppointmentDialog'
 import { FormProvider } from 'react-hook-form'
+import { Appointment } from '@/lib/interface/Appointment'
+import { memo } from 'react'
 
-const events = [
-  { title: 'Meeting', start: new Date() },
-  { title: 'Meeting', start: new Date() },
-]
-export default function AppointmentDetail() {
+export type AppointmentDetailProps = {
+  appointments: Appointment[]
+}
+
+const AppointmentDetail = ({ appointments }: AppointmentDetailProps) => {
   const {
     handleLogin,
     user,
@@ -19,7 +21,8 @@ export default function AppointmentDetail() {
     handleCloseAppointmentDialog,
     methods,
     onSubmit,
-  } = useHooks()
+    events,
+  } = useHooks({ appointments })
 
   return (
     <FormProvider {...methods}>
@@ -59,3 +62,5 @@ export default function AppointmentDetail() {
     </FormProvider>
   )
 }
+
+export default memo(AppointmentDetail)

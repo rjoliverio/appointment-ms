@@ -33,7 +33,7 @@ model User {
 model Appointment {
   id         String    @id @default(cuid())
   setterId   String
-  isApproved Boolean
+  isApproved Boolean   @default(false)
   startTime  DateTime
   endTime    DateTime?
   title      String
