@@ -25,7 +25,7 @@ export const useHooks = () => {
     try {
       await login(data)
       toast.success('Login successful.')
-      router.push('/')
+      router.push('/dashboard')
     } catch (error) {
       toast.error((error as Error).message)
     }
