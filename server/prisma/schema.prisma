@@ -10,6 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AppointmentStatus {
+  Approved
+  Waiting
+  Rejected
+}
+
 model Setter {
   id            String        @id @default(cuid())
   name          String
@@ -31,15 +37,15 @@ model User {
 }
 
 model Appointment {
-  id         String    @id @default(cuid())
-  setterId   String
-  isApproved Boolean   @default(false)
-  startTime  DateTime
-  endTime    DateTime?
-  title      String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  setter     Setter    @relation(fields: [setterId], references: [id])
+  id        String            @id @default(cuid())
+  setterId  String
+  status    AppointmentStatus
+  startTime DateTime
+  endTime   DateTime?
+  title     String
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  setter    Setter            @relation(fields: [setterId], references: [id])
 
   @@index([setterId])
 }

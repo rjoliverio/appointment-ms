@@ -1,4 +1,6 @@
 import type { Config } from 'tailwindcss'
+
+const appointmentStatusColors = ['#727d8a', '#3F83F8', '#F05252']
 const config: Config = {
   content: [
     './node_modules/flowbite-react/lib/**/*.js',
@@ -15,6 +17,7 @@ const config: Config = {
       },
     },
   },
+  safelist: [...appointmentStatusColors.map((color) => `bg-[${color}]`)],
   plugins: [require('flowbite/plugin')],
 }
 export default config

@@ -8,6 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { createAppointment } from '@/app/actions'
 import { toast } from 'react-toastify'
 import { AppointmentDetailProps } from '.'
+import { AppointmentStatus } from '@/lib/interface/Appointment'
 
 const schema = yup.object({
   name: yup.string().required(),
@@ -42,15 +43,28 @@ export const useHooks = ({ appointments }: UseHookParams) => {
     },
   })
 
-  const events = useMemo(() => {
-    return appointments.map((app) => ({
-      title: app.title,
-      start: new Date(app.startTime),
-    }))
-  }, [appointments])
+  const approvedAppointments = useMemo(
+    () =>
+      appointments.filter((app) => app.status === AppointmentStatus.Approved),
+    [appointments],
+  )
+
+  const events = useMemo(
+    () =>
+      approvedAppointments.map((app) => ({
+        id: app.id,
+        title: app.title,
+        start: new Date(app.startTime),
+      })),
+    [approvedAppointments],
+  )
 
   const handleLogin = () => {
     router.push('/login')
+  }
+
+  const handleGoToDashboard = () => {
+    router.push('/dashboard')
   }
 
   const handleCloseAppointmentDialog = () => {
@@ -80,5 +94,6 @@ export const useHooks = ({ appointments }: UseHookParams) => {
     onSubmit,
     handleCloseAppointmentDialog,
     handleOpenAppointmentDialog,
+    handleGoToDashboard,
   }
 }

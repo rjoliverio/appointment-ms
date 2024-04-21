@@ -1,16 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsBoolean, IsDate, IsOptional, IsString } from 'class-validator'
+import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator'
 import { Type } from 'class-transformer'
-import type { Appointment as AppointmentModel } from '@prisma/client'
+import {
+  AppointmentStatus,
+  type Appointment as AppointmentModel,
+} from '@prisma/client'
 
 export class AppointmentEntity {
   @IsString()
   @ApiProperty()
   id: AppointmentModel['id']
 
-  @IsBoolean()
-  @ApiProperty()
-  isApproved: AppointmentModel['isApproved']
+  @IsEnum(AppointmentStatus)
+  @ApiProperty({
+    type: String,
+    enum: AppointmentStatus,
+    enumName: 'AppointmentStatus',
+  })
+  status: AppointmentModel['status']
 
   @IsString()
   @ApiProperty()

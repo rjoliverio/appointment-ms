@@ -1,44 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
   ArrowLeftStartOnRectangleIcon,
   ChevronDownIcon,
 } from '@heroicons/react/24/solid'
+import { useHooks } from './hooks'
 
 const DropdownUser = () => {
-  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const {
+    user,
+    isUserLoading,
+    trigger,
+    setDropdownOpen,
+    dropdownOpen,
+    dropdown,
+  } = useHooks()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const trigger = useRef<any>(null)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const dropdown = useRef<any>(null)
-
-  // close on click outside
-  useEffect(() => {
-    const clickHandler = ({ target }: MouseEvent) => {
-      if (!dropdown.current) return
-      if (
-        !dropdownOpen ||
-        dropdown.current.contains(target) ||
-        trigger.current.contains(target)
-      )
-        return
-      setDropdownOpen(false)
-    }
-    document.addEventListener('click', clickHandler)
-    return () => document.removeEventListener('click', clickHandler)
-  })
-
-  // close if the esc key is pressed
-  useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
-      if (!dropdownOpen || keyCode !== 27) return
-      setDropdownOpen(false)
-    }
-    document.addEventListener('keydown', keyHandler)
-    return () => document.removeEventListener('keydown', keyHandler)
-  })
+  if (isUserLoading) return null
 
   return (
     <div className='relative'>
@@ -50,9 +28,9 @@ const DropdownUser = () => {
       >
         <span className='hidden text-right lg:block'>
           <span className='block text-sm font-medium text-black dark:text-white'>
-            Thomas Anree
+            {user?.setter.name}
           </span>
-          <span className='block text-xs'>UX Designer</span>
+          <span className='block text-xs'>Stylist</span>
         </span>
 
         <span className='h-12 w-12 rounded-full'>

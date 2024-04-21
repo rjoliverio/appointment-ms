@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { FindAllAppointmentResponseDto } from './dto/find-all-appointments-response.dto'
+import { AppointmentStatus } from '@prisma/client'
 
 @Injectable()
 export class AppointmentsService {
@@ -26,6 +27,7 @@ export class AppointmentsService {
 
         await prisma.appointment.create({
           data: {
+            status: AppointmentStatus.Waiting,
             startTime,
             title,
             setter: { connect: { id: setter.id } },
@@ -39,7 +41,6 @@ export class AppointmentsService {
 
   async findAll(): Promise<FindAllAppointmentResponseDto> {
     const appointments = await this.prisma.appointment.findMany({
-      where: { isApproved: true },
       include: {
         setter: true,
       },

@@ -22,6 +22,7 @@ const AppointmentDetail = ({ appointments }: AppointmentDetailProps) => {
     methods,
     onSubmit,
     events,
+    handleGoToDashboard,
   } = useHooks({ appointments })
 
   return (
@@ -37,7 +38,14 @@ const AppointmentDetail = ({ appointments }: AppointmentDetailProps) => {
           >
             Set an appointment
           </button>
-          {!user && (
+          {user ? (
+            <button
+              onClick={handleGoToDashboard}
+              className='bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 text-sm rounded-md'
+            >
+              Go to Dashboard
+            </button>
+          ) : (
             <button
               onClick={handleLogin}
               className='bg-green-500 text-white hover:bg-green-600 py-2 px-4 text-sm rounded-md'

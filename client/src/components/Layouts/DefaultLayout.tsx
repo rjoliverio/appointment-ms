@@ -25,7 +25,7 @@ export default function DefaultLayout({
 
           {/* <!-- ===== Main Content Start ===== --> */}
           <main>
-            <div className='flex min-h-screen flex-col p-5 bg-gray-100'>
+            <div className='flex h-full min-h-screen flex-col p-5 bg-gray-100'>
               {children}
             </div>
           </main>
