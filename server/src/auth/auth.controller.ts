@@ -30,6 +30,14 @@ export class AuthController {
     return await this.authService.login(credential)
   }
 
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse()
+  async logout(@AuthUser() user: FindOneUserDto) {
+    await this.authService.logout(user.id)
+  }
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -37,9 +38,35 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password')
     }
 
+    const accessToken = this.jwtService.sign({ userId: setter.user.id })
+
+    try {
+      await this.prisma.user.update({
+        where: { id: setter.user.id },
+        data: {
+          accessToken,
+        },
+      })
+    } catch (error) {
+      throw new BadRequestException('Cannot update user token')
+    }
+
     // Step 3: Generate a JWT containing the user's ID and return it
     return {
-      accessToken: this.jwtService.sign({ userId: setter.user.id }),
+      accessToken,
+    }
+  }
+
+  async logout(id: string): Promise<void> {
+    try {
+      await this.prisma.user.update({
+        where: { id },
+        data: {
+          accessToken: null,
+        },
+      })
+    } catch (error) {
+      throw new BadRequestException('Failed to logout user')
     }
   }
 }

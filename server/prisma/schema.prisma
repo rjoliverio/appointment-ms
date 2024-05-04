@@ -28,12 +28,13 @@ model Setter {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  setterId  String   @unique()
-  setter    Setter   @relation(fields: [setterId], references: [id])
+  id          String   @id @default(cuid())
+  password    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  setterId    String   @unique()
+  setter      Setter   @relation(fields: [setterId], references: [id])
+  accessToken String?
 }
 
 model Appointment {

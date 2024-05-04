@@ -14,6 +14,7 @@ const DropdownUser = () => {
     setDropdownOpen,
     dropdownOpen,
     dropdown,
+    handleLogoutUser,
   } = useHooks()
 
   if (isUserLoading) return null
@@ -54,7 +55,10 @@ const DropdownUser = () => {
           dropdownOpen === true ? 'block' : 'hidden'
         }`}
       >
-        <button className='flex items-center text-red-500 gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:bg-red-100'>
+        <button
+          onClick={handleLogoutUser}
+          className='flex items-center text-red-500 gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:bg-red-100'
+        >
           <ArrowLeftStartOnRectangleIcon className='h-5 w-5' />
           Sign out
         </button>

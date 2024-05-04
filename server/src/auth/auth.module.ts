@@ -12,7 +12,7 @@ import { UsersModule } from 'src/users/users.module'
     UsersModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '5m' }, // e.g. 30s, 7d, 24h
+      signOptions: { expiresIn: '24h' }, // e.g. 30s, 7d, 24h
     }),
   ],
   controllers: [AuthController],

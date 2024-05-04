@@ -20,3 +20,24 @@ export async function login(data: LoginFormData) {
 
   cookies().set('access_token', jsonResponse.accessToken)
 }
+
+export async function logout() {
+  const token = cookies().get('access_token')
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token?.value}`,
+      },
+    },
+  )
+
+  if (!response.ok) {
+    const jsonResponse = await response.json()
+    throw new Error(jsonResponse.message)
+  }
+
+  cookies().delete('access_token')
+}

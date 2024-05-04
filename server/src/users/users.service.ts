@@ -16,4 +16,19 @@ export class UsersService {
     })
     return { data: user }
   }
+
+  async getAuthenticatedUser(credential: {
+    id: string
+    accessToken: string
+  }): Promise<FindOneUserResponseDto> {
+    const { id, accessToken } = credential
+    const user = await this.prisma.user.findUnique({
+      where: { id, accessToken },
+      select: {
+        id: true,
+        setter: true,
+      },
+    })
+    return { data: user }
+  }
 }
