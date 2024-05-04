@@ -9,7 +9,10 @@ import {
 import { AppointmentsService } from './appointments.service'
 import { ApiOkResponse } from '@nestjs/swagger'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
-import { FindAllAppointmentResponseDto } from './dto/find-all-appointments-response.dto'
+import {
+  FindAllAppointmentResponseDto,
+  UpdateAppointmentStatusDto,
+} from './dto/find-all-appointments-response.dto'
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -28,5 +31,14 @@ export class AppointmentsController {
   @ApiOkResponse()
   async findAll(): Promise<FindAllAppointmentResponseDto> {
     return await this.appointmentsService.findAll()
+  }
+
+  @Post('update-status')
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @ApiOkResponse()
+  async updateStatus(
+    @Body() updateStatusDto: UpdateAppointmentStatusDto,
+  ): Promise<void> {
+    await this.appointmentsService.updateStatus(updateStatusDto)
   }
 }

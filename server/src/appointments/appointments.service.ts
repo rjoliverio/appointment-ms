@@ -1,7 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
-import { FindAllAppointmentResponseDto } from './dto/find-all-appointments-response.dto'
+import {
+  FindAllAppointmentResponseDto,
+  UpdateAppointmentStatusDto,
+} from './dto/find-all-appointments-response.dto'
 import { AppointmentStatus } from '@prisma/client'
 
 @Injectable()
@@ -46,5 +49,23 @@ export class AppointmentsService {
       },
     })
     return { data: appointments }
+  }
+
+  async updateStatus({
+    id,
+    status,
+  }: UpdateAppointmentStatusDto): Promise<void> {
+    try {
+      await this.prisma.appointment.update({
+        data: {
+          status,
+        },
+        where: {
+          id,
+        },
+      })
+    } catch (error) {
+      throw new BadRequestException('Failed to update appointment status')
+    }
   }
 }

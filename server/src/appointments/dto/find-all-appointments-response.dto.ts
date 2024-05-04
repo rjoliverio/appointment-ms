@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty, PickType } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
 import { IsArray, IsObject, ValidateNested } from 'class-validator'
 import { AppointmentEntity } from '../entities/appointment.entity'
@@ -18,3 +18,8 @@ export class FindAllAppointmentResponseDto {
   @ApiProperty({ type: FindOneAppointmentDto, isArray: true })
   data: FindOneAppointmentDto[]
 }
+
+export class UpdateAppointmentStatusDto extends PickType(AppointmentEntity, [
+  'id',
+  'status',
+]) {}
