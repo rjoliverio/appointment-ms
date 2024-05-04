@@ -13,6 +13,8 @@ export interface Appointment {
   endTime: string | null
   title: string
   setter: Setter
+  createdAt: string
+  updatedAt: string
 }
 
 export interface FindAllAppointmentsResponse {

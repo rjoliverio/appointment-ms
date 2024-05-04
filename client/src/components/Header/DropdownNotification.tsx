@@ -1,8 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { BellIcon } from '@heroicons/react/24/outline'
+import { HeaderProps } from '.'
+import { useHooks } from './hooks'
+import moment from 'moment'
 
-const DropdownNotification = () => {
+const DropdownNotification = ({
+  appointments,
+}: Pick<HeaderProps, 'appointments'>) => {
+  const { waitingAppointments } = useHooks({ appointments })
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [notifying, setNotifying] = useState(true)
 
@@ -24,16 +30,6 @@ const DropdownNotification = () => {
     }
     document.addEventListener('click', clickHandler)
     return () => document.removeEventListener('click', clickHandler)
-  })
-
-  // close if the esc key is pressed
-  useEffect(() => {
-    const keyHandler = ({ keyCode }: KeyboardEvent) => {
-      if (!dropdownOpen || keyCode !== 27) return
-      setDropdownOpen(false)
-    }
-    document.addEventListener('keydown', keyHandler)
-    return () => document.removeEventListener('keydown', keyHandler)
   })
 
   return (
@@ -62,30 +58,37 @@ const DropdownNotification = () => {
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
-        className={`absolute -right-27 mt-2.5 flex h-90 w-75 flex-col rounded-md border bg-white shadow-sm sm:right-0 sm:w-80 ${
+        className={`absolute mt-2.5 flex max-h-96 overflow-y-auto flex-col rounded-md border bg-white shadow-sm sm:right-0 sm:w-80 ${
           dropdownOpen === true ? 'block' : 'hidden'
         }`}
       >
-        <div className='px-4 py-3'>
+        <div className='py-3 sticky px-4 top-0 bg-white border-b'>
           <h5 className='text-sm font-medium'>Notification</h5>
         </div>
 
-        <ul className='flex h-auto flex-col px-4 overflow-y-auto'>
-          <li>
-            <Link
-              className='flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4'
-              href='#'
-            >
-              <p className='text-sm text-gray-500'>
-                <span className='text-black dark:text-white'>
-                  Edit your information in a swipe
-                </span>{' '}
-                Sint occaecat cupidatat non proident, sunt in culpa qui officia
-              </p>
+        <ul className='flex h-auto px-4 flex-col divide-y'>
+          {waitingAppointments.map((appointment) => (
+            <li key={appointment.id}>
+              <Link
+                className='flex flex-col gap-2.5 px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4'
+                href='#'
+              >
+                <p className='text-sm text-gray-500'>
+                  <span className='text-black dark:text-white'>
+                    [CLIENT] {appointment.setter.name}
+                  </span>{' '}
+                  submitted an appointment for{' '}
+                  {moment(new Date(appointment.startTime)).format(
+                    'dddd, MMMM Do YYYY, h:mm A',
+                  )}
+                </p>
 
-              <p className='text-xs text-gray-500'>12 May, 2025</p>
-            </Link>
-          </li>
+                <p className='text-xs text-gray-500'>
+                  {moment(new Date(appointment.createdAt)).fromNow()}
+                </p>
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     </li>

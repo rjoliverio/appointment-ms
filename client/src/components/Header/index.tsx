@@ -1,12 +1,16 @@
+import { Appointment } from '@/lib/interface/Appointment'
 import DropdownNotification from './DropdownNotification'
 import DropdownUser from './DropdownUser'
 import { Bars3Icon } from '@heroicons/react/24/solid'
 
-const Header = (props: {
+export interface HeaderProps {
   sidebarOpen: string | boolean | undefined
   // eslint-disable-next-line no-unused-vars
   setSidebarOpen: (arg0: boolean) => void
-}) => {
+  appointments: Appointment[]
+}
+
+const Header = (props: HeaderProps) => {
   return (
     <header className='sticky top-0 z-40 flex w-full bg-white drop-shadow-1'>
       <div className='flex flex-grow items-center justify-between lg:justify-end px-4 py-4 shadow-2 md:px-6 2xl:px-11'>
@@ -27,7 +31,7 @@ const Header = (props: {
         <div className='flex items-center gap-3 '>
           <ul className='flex items-center gap-2'>
             {/* <!-- Notification Menu Area --> */}
-            <DropdownNotification />
+            <DropdownNotification appointments={props.appointments} />
             {/* <!-- Notification Menu Area --> */}
           </ul>
 
