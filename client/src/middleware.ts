@@ -1,18 +1,15 @@
+'use server'
+
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { authRoutes, protectedRoutes } from './routes/routes'
+import { authFetcher } from './app/login/actions'
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get('access_token')?.value
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
+  const res = await authFetcher(`/auth/me`)
 
   if (protectedRoutes.includes(request.nextUrl.pathname) && !res.ok) {
-    request.cookies.delete('access_token')
+    request.cookies.delete('Authentication')
     const response = NextResponse.redirect(new URL('/login', request.url))
 
     return response
