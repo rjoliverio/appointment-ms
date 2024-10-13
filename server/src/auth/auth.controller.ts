@@ -1,20 +1,13 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common'
+import { Controller, Get, Post, Res, UseGuards } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { AuthEntity } from './entity/auth.entity'
-import { LoginDto } from './dto/login.dto'
-import { ApiOkResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { JwtAuthGuard } from './jwt-auth.guard'
+import { ApiOkResponse } from '@nestjs/swagger'
+import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { AuthUser } from 'src/decorators/user.decorator'
 import { FindOneUserDto } from 'src/users/dto/find-one-user.dto'
 import { UsersService } from 'src/users/users.service'
+import { LocalAuthGuard } from './guards/local-auth.guard'
+import { Response } from 'express'
 
 @Controller('auth')
 export class AuthController {
@@ -23,26 +16,26 @@ export class AuthController {
     private readonly userService: UsersService,
   ) {}
 
+  @UseGuards(LocalAuthGuard)
   @Post('login')
-  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   @ApiOkResponse({ type: AuthEntity })
-  async login(@Body() credential: LoginDto) {
-    return await this.authService.login(credential)
+  async login(
+    @AuthUser() user: Pick<FindOneUserDto, 'id'>,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return await this.authService.login(user, response)
   }
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOkResponse()
-  async logout(@AuthUser() user: FindOneUserDto) {
-    await this.authService.logout(user.id)
+  async logout(@Res() response: Response) {
+    await this.authService.logout(response)
   }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOkResponse({ type: FindOneUserDto })
-  async getUser(@AuthUser() user: FindOneUserDto) {
+  async getUser(@AuthUser() user: Pick<FindOneUserDto, 'id'>) {
     return await this.userService.findOne(user.id)
   }
 }

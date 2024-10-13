@@ -1,23 +1,25 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common'
+import ms from 'ms'
+import { Response } from 'express'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { JwtService } from '@nestjs/jwt'
-import { LoginDto } from './dto/login.dto'
 import * as bcrypt from 'bcrypt'
-import { AuthEntity } from './entity/auth.entity'
+import { FindOneUserDto } from 'src/users/dto/find-one-user.dto'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
-  async login({ email, password }: LoginDto): Promise<AuthEntity> {
-    // Step 1: Fetch a user with the given email
+
+  async verifyUser(email: string, password: string) {
     const setter = await this.prisma.setter.findUnique({
       where: { email },
       select: {
@@ -25,48 +27,41 @@ export class AuthService {
       },
     })
 
-    // If no user is found, throw an error
     if (!setter || !setter.user) {
       throw new NotFoundException(`No user found for email: ${email}`)
     }
 
-    // Step 2: Check if the password is correct
     const isPasswordValid = await bcrypt.compare(password, setter.user.password)
 
-    // If password does not match, throw an error
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password')
     }
 
-    const accessToken = this.jwtService.sign({ userId: setter.user.id })
-
-    try {
-      await this.prisma.user.update({
-        where: { id: setter.user.id },
-        data: {
-          accessToken,
-        },
-      })
-    } catch (error) {
-      throw new BadRequestException('Cannot update user token')
-    }
-
-    // Step 3: Generate a JWT containing the user's ID and return it
-    return {
-      accessToken,
-    }
+    return { id: setter.user.id }
   }
 
-  async logout(id: string): Promise<void> {
-    try {
-      await this.prisma.user.update({
-        where: { id },
-        data: {
-          accessToken: null,
-        },
-      })
-    } catch (error) {
-      throw new BadRequestException('Failed to logout user')
-    }
+  async login(
+    user: Pick<FindOneUserDto, 'id'>,
+    response: Response,
+  ): Promise<Pick<FindOneUserDto, 'id'>> {
+    const expires = new Date()
+    expires.setMilliseconds(
+      expires.getMilliseconds() +
+        ms(this.configService.getOrThrow<string>('JWT_EXPIRATION')),
+    )
+
+    const accessToken = this.jwtService.sign({ id: user.id })
+    response.cookie('Authentication', accessToken, {
+      secure: true,
+      httpOnly: true,
+      expires,
+    })
+
+    return user
+  }
+
+  async logout(response: Response): Promise<void> {
+    response.clearCookie('Authentication')
+    response.send()
   }
 }
