@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { jwtDecode } from 'jwt-decode'
 import { LoginFormData } from '@/components/LoginForm/hooks'
 
+const baseURL = process.env.NEXT_PUBLIC_API_URL
 export async function login(data: LoginFormData) {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
@@ -34,26 +35,24 @@ export async function logout() {
     },
   )
 
-  if (!response.ok) {
-    const jsonResponse = await response.json()
-    throw new Error(jsonResponse.message)
-  }
-
-  cookies().delete('access_token')
+  deleteAuthCookie(response)
 }
 
 export const getHeaders = () => ({
   Cookie: cookies().toString(),
 })
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL
-export const authFetcher = async (url: string) => {
-  return await fetch(`${baseURL}${url}`, {
+export const authFetcher = async (url: string, middleware: boolean = false) => {
+  const res = await fetch(`${baseURL}${url}`, {
     method: 'GET',
     headers: {
       ...getHeaders(),
     },
   })
+
+  if (middleware) return res
+
+  return res.json()
 }
 
 const setAuthCookie = (response: Response) => {
@@ -67,5 +66,15 @@ const setAuthCookie = (response: Response) => {
       httpOnly: true,
       expires: new Date(jwtDecode(token).exp! * 1000),
     })
+  }
+}
+
+const deleteAuthCookie = (response: Response) => {
+  const setCookieHeader = response.headers.get('Set-Cookie')
+  if (setCookieHeader) {
+    const token = setCookieHeader.split(';')[0].split('=')[1]
+    if (!token) {
+      cookies().delete('Authentication')
+    }
   }
 }

@@ -61,7 +61,11 @@ export class AuthService {
   }
 
   async logout(response: Response): Promise<void> {
-    response.clearCookie('Authentication')
+    response.clearCookie('Authentication', {
+      secure: true,
+      httpOnly: true,
+    })
+
     response.send()
   }
 }

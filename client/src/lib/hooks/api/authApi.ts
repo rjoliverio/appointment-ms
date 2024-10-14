@@ -4,10 +4,7 @@ import { useMemo } from 'react'
 import useSWR, { mutate } from 'swr'
 
 export const authApi = () => {
-  // TODO: update server actions since this is not working
-  const { data, isLoading } = useSWR<UserResponse>('/auth/me', (url: string) =>
-    authFetcher(url).then((r) => r.json()),
-  )
+  const { data, isLoading } = useSWR<UserResponse>('/auth/me', authFetcher)
   const user = useMemo(() => data?.data || null, [data?.data])
 
   const refetch = mutate('/auth/me')
