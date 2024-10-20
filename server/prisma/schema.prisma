@@ -66,4 +66,5 @@ model Notification {
   updatedAt        DateTime         @updatedAt
   senderId         String?
   sender           Setter?          @relation(fields: [senderId], references: [id])
+  readAt           DateTime?
 }
