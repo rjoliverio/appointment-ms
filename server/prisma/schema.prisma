@@ -16,15 +16,20 @@ enum AppointmentStatus {
   Rejected
 }
 
+enum NotificationType {
+  Appointment
+}
+
 model Setter {
-  id            String        @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String
-  email         String        @unique
+  email         String         @unique
   contactNumber String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   appointments  Appointment[]
   user          User?
+  notifications Notification[]
 }
 
 model User {
@@ -49,4 +54,16 @@ model Appointment {
   setter    Setter            @relation(fields: [setterId], references: [id])
 
   @@index([setterId])
+}
+
+model Notification {
+  id               String           @id @default(cuid())
+  title            String
+  description      String?
+  link             String?
+  notificationType NotificationType
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  senderId         String?
+  sender           Setter?          @relation(fields: [senderId], references: [id])
 }
