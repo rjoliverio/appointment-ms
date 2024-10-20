@@ -4,9 +4,9 @@ export class FindAllNotificationsQueryDto {
   @IsString()
   @IsOptional()
   @ApiProperty({ type: String, nullable: true })
-  cursor: string | null
+  cursor?: string
 
   @IsNumber()
-  @ApiProperty({ type: Number, default: 10 })
-  take: number = 10
+  @ApiProperty({ type: Number, default: 5 })
+  take: number = 5
 }

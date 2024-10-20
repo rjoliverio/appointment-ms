@@ -1,14 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { BellIcon } from '@heroicons/react/24/outline'
-import { HeaderProps } from '.'
-import { useHooks } from './hooks'
 import moment from 'moment'
+import { useHooks } from './hooks'
 
-const DropdownNotification = ({
-  appointments,
-}: Pick<HeaderProps, 'appointments'>) => {
-  const { waitingAppointments } = useHooks({ appointments })
+const DropdownNotification = () => {
+  const {
+    notifications,
+    refetch,
+    ref,
+    inView,
+    nextCursor,
+    isNotificationLoading,
+  } = useHooks()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [notifying, setNotifying] = useState(true)
 
@@ -31,6 +35,12 @@ const DropdownNotification = ({
     document.addEventListener('click', clickHandler)
     return () => document.removeEventListener('click', clickHandler)
   })
+
+  useEffect(() => {
+    if (inView && nextCursor) {
+      refetch()
+    }
+  }, [inView])
 
   return (
     <li className='relative'>
@@ -67,29 +77,34 @@ const DropdownNotification = ({
         </div>
 
         <ul className='flex h-auto px-4 flex-col divide-y'>
-          {waitingAppointments.map((appointment) => (
-            <li key={appointment.id}>
+          {notifications.map((notification) => (
+            <li key={notification.id}>
               <Link
                 className='flex flex-col gap-2.5 px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4'
-                href='#'
+                href={notification.link}
               >
                 <p className='text-sm text-gray-500'>
                   <span className='text-black dark:text-white'>
-                    [CLIENT] {appointment.setter.name}
+                    {notification.title}
                   </span>{' '}
-                  submitted an appointment for{' '}
-                  {moment(new Date(appointment.startTime)).format(
-                    'dddd, MMMM Do YYYY, h:mm A',
-                  )}
+                  {notification.description}
                 </p>
 
                 <p className='text-xs text-gray-500'>
-                  {moment(new Date(appointment.createdAt)).fromNow()}
+                  {moment(new Date(notification.createdAt)).fromNow()}
                 </p>
               </Link>
             </li>
           ))}
         </ul>
+        {!isNotificationLoading && !nextCursor && (
+          <p className='px-4 flex w-full items-center justify-center mt-1 text-xs text-gray-400'>
+            End of notifications
+          </p>
+        )}
+        <span style={{ visibility: 'hidden' }} ref={ref}>
+          intersection observer marker
+        </span>
       </div>
     </li>
   )

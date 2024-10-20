@@ -31,7 +31,7 @@ const Header = (props: HeaderProps) => {
         <div className='flex items-center gap-3 '>
           <ul className='flex items-center gap-2'>
             {/* <!-- Notification Menu Area --> */}
-            <DropdownNotification appointments={props.appointments} />
+            <DropdownNotification />
             {/* <!-- Notification Menu Area --> */}
           </ul>
 

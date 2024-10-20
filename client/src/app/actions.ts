@@ -69,3 +69,14 @@ export async function updateAppointmentStatus(
 
   revalidatePath('/dashboard')
 }
+
+export async function notificationsFetcher(url: string, cursor?: string) {
+  const query = `${cursor ? `?cursor=${cursor}` : ''}`
+  return await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}${query}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getHeaders(),
+    },
+  }).then((res) => res.json())
+}

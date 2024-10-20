@@ -32,9 +32,7 @@ export class NotificationsService {
   async findAll(
     queryDto: FindAllNotificationsQueryDto,
   ): Promise<FindAllNotificationsResponseDto> {
-    const { cursor, take } = queryDto
-
-    // Fetch notifications after the provided cursor
+    const { cursor, take = 5 } = queryDto
     const notifications = await this.prisma.notification.findMany({
       take: take,
       skip: cursor ? 1 : 0, // Skip the cursor itself
@@ -51,7 +49,7 @@ export class NotificationsService {
     })
 
     const nextCursor =
-      notifications.length === take ? notifications[take - 1].id : null
+      notifications.length === take ? notifications[take - 1].id : undefined
 
     const totalUnreadCount = await this.prisma.notification.count({
       where: {

@@ -15,7 +15,7 @@ const DropdownUser = () => {
     dropdownOpen,
     dropdown,
     handleLogoutUser,
-  } = useHooks({})
+  } = useHooks()
 
   if (isUserLoading) return null
 

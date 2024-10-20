@@ -1,31 +1,29 @@
 import { logout } from '@/app/login/actions'
 import { authApi } from '@/lib/hooks/api/authApi'
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
-import { HeaderProps } from '.'
-import { AppointmentStatus } from '@/lib/interface/Appointment'
+import { useNotifications } from '@/lib/hooks/api/notificationsApi'
+import { useInView } from 'react-intersection-observer'
 
-type UseHooksProps = Partial<Pick<HeaderProps, 'appointments'>>
-export const useHooks = ({ appointments = [] }: UseHooksProps) => {
+// type UseHooksProps = Partial<Pick<HeaderProps, 'appointments'>>
+export const useHooks = () => {
   const router = useRouter()
+  const { ref, inView } = useInView()
   const { user, isLoading: isUserLoading } = authApi()
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const {
+    notifications,
+    isLoading: isNotificationLoading,
+    refetch,
+    totalUnreadCount,
+    nextCursor,
+  } = useNotifications()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const trigger = useRef<any>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dropdown = useRef<any>(null)
-
-  const waitingAppointments = useMemo(
-    () =>
-      appointments
-        .filter((app) => app.status === AppointmentStatus.Waiting)
-        .sort((a, b) =>
-          new Date(a.createdAt) > new Date(b.createdAt) ? -1 : 1,
-        ),
-    [appointments],
-  )
 
   const handleLogoutUser = async () => {
     try {
@@ -61,6 +59,12 @@ export const useHooks = ({ appointments = [] }: UseHooksProps) => {
     dropdownOpen,
     dropdown,
     handleLogoutUser,
-    waitingAppointments,
+    notifications,
+    refetch,
+    totalUnreadCount,
+    ref,
+    inView,
+    isNotificationLoading,
+    nextCursor,
   }
 }
