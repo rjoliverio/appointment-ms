@@ -18,7 +18,9 @@ export class FindAllNotificationsResponseDto {
   @IsString()
   @ApiProperty({ type: String, nullable: true })
   nextCursor: string | null
+}
 
+export class GetNotificationUnreadCount {
   @IsNumber()
   @ApiProperty()
   totalUnreadCount: number

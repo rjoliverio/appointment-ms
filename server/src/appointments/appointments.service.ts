@@ -6,16 +6,21 @@ import {
   UpdateAppointmentStatusDto,
 } from './dto/find-all-appointments-response.dto'
 import { AppointmentStatus } from '@prisma/client'
+import { EventEmitter2 } from '@nestjs/event-emitter'
+import { EventTypes } from 'src/event-emitter/event-types'
 
 @Injectable()
 export class AppointmentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   async create(createAppointmentDto: CreateAppointmentDto): Promise<void> {
     const { startTime, title, ...setterData } = createAppointmentDto
-    try {
-      await this.prisma.$transaction(async (prisma) => {
-        let setter = await prisma.setter.findUnique({
+    const appointment = await this.prisma.$transaction(
+      async (transactionPrisma) => {
+        let setter = await transactionPrisma.setter.findUnique({
           where: { email: setterData.email },
           select: {
             id: true,
@@ -23,23 +28,28 @@ export class AppointmentsService {
         })
 
         if (!setter) {
-          setter = await prisma.setter.create({
+          setter = await transactionPrisma.setter.create({
             data: setterData,
           })
         }
 
-        await prisma.appointment.create({
+        const appointment = await transactionPrisma.appointment.create({
           data: {
             status: AppointmentStatus.Waiting,
             startTime,
             title,
             setter: { connect: { id: setter.id } },
           },
+          select: { id: true },
         })
-      })
-    } catch (error) {
-      throw new BadRequestException('Cannot create appointment')
-    }
+
+        return appointment
+      },
+    )
+
+    this.eventEmitter.emit(EventTypes.AppointmentCreated, {
+      appointmentId: appointment.id,
+    })
   }
 
   async findAll(): Promise<FindAllAppointmentResponseDto> {

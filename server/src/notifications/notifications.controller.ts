@@ -27,6 +27,11 @@ export class NotificationsController {
     return await this.notificationsService.findAll(query)
   }
 
+  @Get('unread/count')
+  async getTotalUnreadCount() {
+    return await this.notificationsService.getUnreadCount()
+  }
+
   @Put()
   async updateReadAt(@Body() id: string) {
     return await this.notificationsService.updateReadAt(id)

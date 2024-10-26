@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module'
 import { AppointmentsModule } from './appointments/appointments.module'
 import { ConfigModule } from '@nestjs/config'
 import { NotificationsModule } from './notifications/notifications.module'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 
 @Module({
   imports: [
@@ -14,6 +15,9 @@ import { NotificationsModule } from './notifications/notifications.module'
     AppointmentsModule,
     ConfigModule.forRoot(),
     NotificationsModule,
+    EventEmitterModule.forRoot({
+      wildcard: true,
+    }),
   ],
 })
 export class AppModule {}

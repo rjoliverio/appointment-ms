@@ -2,7 +2,10 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { CreateNotificationDto } from './dto/create-notification.dto'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { FindAllNotificationsQueryDto } from './dto/find-all-notifications-query-dto'
-import { FindAllNotificationsResponseDto } from './dto/find-all-notifications-response-dto'
+import {
+  FindAllNotificationsResponseDto,
+  GetNotificationUnreadCount,
+} from './dto/find-all-notifications-response-dto'
 import { selectFindAllNotifications } from './queries/notification.queries'
 
 @Injectable()
@@ -51,17 +54,19 @@ export class NotificationsService {
     const nextCursor =
       notifications.length === take ? notifications[take - 1].id : undefined
 
+    return {
+      data: notifications,
+      nextCursor,
+    }
+  }
+
+  async getUnreadCount(): Promise<GetNotificationUnreadCount> {
     const totalUnreadCount = await this.prisma.notification.count({
       where: {
         readAt: null,
       },
     })
-
-    return {
-      data: notifications,
-      totalUnreadCount,
-      nextCursor,
-    }
+    return { totalUnreadCount }
   }
 
   async updateReadAt(id: string) {
