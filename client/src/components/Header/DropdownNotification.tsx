@@ -2,17 +2,21 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { BellIcon } from '@heroicons/react/24/outline'
 import moment from 'moment'
-import { useHooks } from './hooks'
+import { useNotifications } from '@/lib/hooks/api/notificationsApi'
+import { useInView } from 'react-intersection-observer'
 
 const DropdownNotification = () => {
   const {
     notifications,
-    refetch,
-    ref,
-    inView,
+    isLoading,
+    refetchCursor,
     nextCursor,
-    isNotificationLoading,
-  } = useHooks()
+    isValidating,
+    resetCursor,
+    mutate,
+  } = useNotifications()
+  const isNotificationLoading = isValidating || isLoading
+  const { ref, inView } = useInView()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [notifying, setNotifying] = useState(true)
 
@@ -20,6 +24,10 @@ const DropdownNotification = () => {
   const trigger = useRef<any>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dropdown = useRef<any>(null)
+
+  useEffect(() => {
+    if (inView && !isNotificationLoading) refetchCursor()
+  }, [inView, isNotificationLoading])
 
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
@@ -31,22 +39,22 @@ const DropdownNotification = () => {
       )
         return
       setDropdownOpen(false)
+      resetCursor()
     }
     document.addEventListener('click', clickHandler)
     return () => document.removeEventListener('click', clickHandler)
   })
 
   useEffect(() => {
-    if (inView && nextCursor) {
-      refetch()
-    }
-  }, [inView])
+    if (dropdownOpen) mutate({ data: [], nextCursor: undefined })
+  }, [dropdownOpen])
 
   return (
     <li className='relative'>
       <Link
         ref={trigger}
-        onClick={() => {
+        onClick={async () => {
+          resetCursor()
           setNotifying(false)
           setDropdownOpen(!dropdownOpen)
         }}
@@ -102,9 +110,11 @@ const DropdownNotification = () => {
             End of notifications
           </p>
         )}
-        <span style={{ visibility: 'hidden' }} ref={ref}>
-          intersection observer marker
-        </span>
+        {!isNotificationLoading && (
+          <span style={{ visibility: 'hidden' }} ref={ref}>
+            intersection observer marker
+          </span>
+        )}
       </div>
     </li>
   )

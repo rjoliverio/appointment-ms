@@ -9,6 +9,9 @@ export interface Notification {
 
 export interface FindAllNotificationsResponse {
   data: Notification[]
-  totalUnreadCount: number
   nextCursor?: string
+}
+
+export interface GetNotificationUnreadCount {
+  totalUnreadCount: number
 }

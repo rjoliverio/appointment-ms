@@ -3,22 +3,11 @@ import { authApi } from '@/lib/hooks/api/authApi'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
-import { useNotifications } from '@/lib/hooks/api/notificationsApi'
-import { useInView } from 'react-intersection-observer'
 
-// type UseHooksProps = Partial<Pick<HeaderProps, 'appointments'>>
 export const useHooks = () => {
   const router = useRouter()
-  const { ref, inView } = useInView()
   const { user, isLoading: isUserLoading } = authApi()
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const {
-    notifications,
-    isLoading: isNotificationLoading,
-    refetch,
-    totalUnreadCount,
-    nextCursor,
-  } = useNotifications()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const trigger = useRef<any>(null)
@@ -59,12 +48,5 @@ export const useHooks = () => {
     dropdownOpen,
     dropdown,
     handleLogoutUser,
-    notifications,
-    refetch,
-    totalUnreadCount,
-    ref,
-    inView,
-    isNotificationLoading,
-    nextCursor,
   }
 }
