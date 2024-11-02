@@ -51,7 +51,7 @@ export const useNotifications = () => {
   }
 
   useEffect(() => {
-    setNotifications([...notifications, ...(data?.data ?? [])])
+    setNotifications((prev) => [...prev, ...(data?.data ?? [])])
   }, [data])
 
   useEffect(() => {

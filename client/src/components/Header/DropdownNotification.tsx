@@ -26,8 +26,8 @@ const DropdownNotification = () => {
   const dropdown = useRef<any>(null)
 
   useEffect(() => {
-    if (inView && !isNotificationLoading) refetchCursor()
-  }, [inView, isNotificationLoading])
+    if (inView) refetchCursor()
+  }, [inView])
 
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
@@ -38,6 +38,8 @@ const DropdownNotification = () => {
         trigger.current.contains(target)
       )
         return
+
+      dropdown.current.scrollTop = 0
       setDropdownOpen(false)
       resetCursor()
     }
@@ -51,6 +53,11 @@ const DropdownNotification = () => {
         ref={trigger}
         onClick={async () => {
           resetCursor()
+
+          if (dropdown) {
+            dropdown.current.scrollTop = 0
+          }
+
           setDropdownOpen(!dropdownOpen)
         }}
         href='#'
@@ -67,8 +74,6 @@ const DropdownNotification = () => {
 
       <div
         ref={dropdown}
-        onFocus={() => setDropdownOpen(true)}
-        onBlur={() => setDropdownOpen(false)}
         className={`absolute mt-2.5 flex max-h-96 overflow-y-auto flex-col rounded-md border bg-white shadow-sm sm:right-0 sm:w-80 ${
           dropdownOpen === true ? 'block' : 'hidden'
         }`}
@@ -98,16 +103,15 @@ const DropdownNotification = () => {
             </li>
           ))}
         </ul>
-        {!isNotificationLoading && !nextCursor && (
+        {(!isNotificationLoading || !nextCursor) && (
           <p className='px-4 flex w-full items-center justify-center mt-1 text-xs text-gray-400'>
             End of notifications
           </p>
         )}
-        {!isNotificationLoading && (
-          <span style={{ visibility: 'hidden' }} ref={ref}>
-            intersection observer marker
-          </span>
-        )}
+
+        <span style={{ visibility: 'hidden' }} ref={ref}>
+          intersection observer marker
+        </span>
       </div>
     </li>
   )
