@@ -8,17 +8,17 @@ import { useInView } from 'react-intersection-observer'
 const DropdownNotification = () => {
   const {
     notifications,
-    isLoading,
+    isLoadingNotifications,
     refetchCursor,
     nextCursor,
-    isValidating,
+    isValidatingNotifications,
     resetCursor,
-    mutate,
+    totalUnreadCount,
   } = useNotifications()
-  const isNotificationLoading = isValidating || isLoading
+  const isNotificationLoading =
+    isValidatingNotifications || isLoadingNotifications
   const { ref, inView } = useInView()
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [notifying, setNotifying] = useState(true)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const trigger = useRef<any>(null)
@@ -45,29 +45,22 @@ const DropdownNotification = () => {
     return () => document.removeEventListener('click', clickHandler)
   })
 
-  useEffect(() => {
-    if (dropdownOpen) mutate({ data: [], nextCursor: undefined })
-  }, [dropdownOpen])
-
   return (
     <li className='relative'>
       <Link
         ref={trigger}
         onClick={async () => {
           resetCursor()
-          setNotifying(false)
           setDropdownOpen(!dropdownOpen)
         }}
         href='#'
         className='relative flex h-8.5 w-8.5 p-2 items-center justify-center rounded-full border-[0.5px] bg-slate-50 hover:text-primary'
       >
-        <span
-          className={`absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full${
-            notifying === false ? 'hidden' : 'inline'
-          }`}
-        >
-          <span className='absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-meta-1 opacity-75'></span>
-        </span>
+        {totalUnreadCount > 0 && (
+          <span className='absolute inline-flex align-middle justify-center -top-0.5 right-0 z-1 h-5 w-5 p-0.5 rounded-full text-xs text-white bg-red-600'>
+            {totalUnreadCount}
+          </span>
+        )}
 
         <BellIcon className='h-5 w-5' />
       </Link>
