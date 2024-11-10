@@ -21,4 +21,7 @@ const generateMock = () => {
 export class PrismaServiceMock {
   user = generateMock()
   notification = generateMock()
+  appointment = generateMock()
+  setter = generateMock()
+  $transaction = jest.fn()
 }
