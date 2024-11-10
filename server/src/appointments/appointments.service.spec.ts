@@ -11,7 +11,7 @@ import {
 } from './dto/find-all-appointments-response.dto'
 import { BadRequestException } from '@nestjs/common'
 
-describe('UsersService', () => {
+describe('AppointmentService', () => {
   let moduleRef: TestingModule
   let appointmentsService: AppointmentsService
   let prismaService: PrismaServiceMock
